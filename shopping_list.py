@@ -1,31 +1,75 @@
 import sys
-
-
+import json
 
 class ShoppingList:
 
 	def __init__(self):
 
-		self.date_file = 'groceries.json'
+		self.filename = 'lists_save_file.json'
+		self.user_information_file = 'user_information.json'
 
-		self.lists = {
-			'groceries' : [],
-			'appliances' : [],
-			'car' : [],
-		}
+		self.username = ''
+		self._file_check_username()
+		self.lists = {}
+		self._file_check_lists()
 
-		self.groceries = []
 		#set the first key to be the active list by default
 		self.active_list = next(iter(self.lists))
 		#Capitalize the list name for output to the console
 		self.display_active_list = self.active_list.title()
 		#Set the key making changes to the current list
 		self.current_key = self.lists[self.active_list]
+
+
+	def _file_check_username(self):
+		"""
+			Check if a username already exists.
+			If not, ask for a username and save it.
+		"""
+
+		try:
+			with open(self.user_information_file) as f:
+				self.username = json.load(f)
+		except FileNotFoundError:
+			self.username = input("Welcome! What is your name: ")
+			with open(self.user_information_file, 'w') as f:
+				json.dump(self.username.title(), f)
+				print(f"\nHi, {self.username.title()}!")
+		else:
+			print(f"\nWelcome back, {self.username}!\n")
+
+	def _file_check_lists(self):
+		"""Check if a list file already exists. If not, create a new one and add some lists"""
+
+		try:
+			with open(self.filename) as f:
+				self.lists = json.load(f)
+		except FileNotFoundError:
+			self.lists = {
+				'groceries' : [],
+				'to-do' : [],
+				'favourite movies' : [],
+			}
+			with open(self.filename, 'w') as f:
+				json.dump(self.lists, f)
+			print("We've created some lists for you to get started!\n")
+		else:
+			with open(self.filename) as f:
+				self.lists = json.load(f)
+
+
+
+	def save_to_file(self):
+		"""Save lists to a json file"""
+
+		with open(self.filename, 'w') as f:
+			json.dump(self.lists, f)
 	
 
 	def change_active_list(self):
 		"""Set active list to work with"""
-		print("\nWhich list should be your active list?\n")
+		print("\nWhich list should be your active list?")
+		print("Type in 'q' to go back.\n")
 
 		#Convert dictionary keys into list and access them by key
 		for i in range(0, len(self.lists)):
@@ -34,15 +78,21 @@ class ShoppingList:
 		print('\n')
 
 		prompt = int(input("Please enter the number of the list: "))
-		
-		try:
-			self.active_list = list(self.lists.keys())[prompt-1]
-		except ValueError:
-			print("Please enter a valid list number!\n")
-		else:
-			self.display_active_list = self.active_list.title()
-			self.current_key = self.lists[self.active_list] 
-			print(f"Your active list has been changed to {self.display_active_list}.\n")
+
+		while True:
+			if prompt != 'q':		
+				try:
+					self.active_list = list(self.lists.keys())[prompt-1]
+				except ValueError:
+					print("Please enter a valid list number!\n")
+				else:
+					self.display_active_list = self.active_list.title()
+					self.current_key = self.lists[self.active_list] 
+					print(f"Your active list has been changed to {self.display_active_list}.\n")
+					break
+			else:
+				break
+
 
 		
 	def add_new_list(self):
@@ -120,7 +170,6 @@ class ShoppingList:
 						print(f"{item_to_remove.title()} was removed from your list.\n")
 				else:
 					break
-
 		else:
 			print("\nYour list is empty; there's nothing to remove!\n")
 			
@@ -139,7 +188,7 @@ class ShoppingList:
 		"""Output the current contents of the list"""
 
 		if len(self.current_key) == 0:
-			print("\nYour list is currently empty!")
+			print("\n\tYour list is currently empty!")
 		else:
 			print("\nYour list so far: \n")
 			for item in self.current_key:
@@ -148,17 +197,15 @@ class ShoppingList:
 		print(' ')
 
 
+
 	def display_menu(self):
 		"""
 			Starting point for program
 			Display a menu with choices
 		"""
 
-		print("\nWelcome to your shopping list assistant!\n")
-
 		while True:
-			print("Active List: " + self.display_active_list)
-			self.print_current_list()
+			print(f"Active List: {self.display_active_list}\n")
 
 			menu = {
 				'1' : "Change the active list",
@@ -190,6 +237,8 @@ class ShoppingList:
 				elif prompt == 'c':
 					self.clear_list()
 				elif prompt == 'q':
+					self.save_to_file()
+					print("Your changes have been saved for the next time you come back!")
 					break
 				else:
 					print("Please enter a valid command!")

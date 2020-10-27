@@ -38,6 +38,7 @@ class ShoppingList:
 		else:
 			print(f"\nWelcome back, {self.username}!\n")
 
+
 	def _file_check_lists(self):
 		"""Check if a list file already exists. If not, create a new one and add some lists"""
 
@@ -66,25 +67,31 @@ class ShoppingList:
 			json.dump(self.lists, f)
 	
 
+	def _show_lists_by_number(self):
+		"""Convert dictionary keys into list and access them by key"""
+		for i in range(0, len(self.lists)):
+			print(f"\t{i+1} : {list(self.lists.keys())[i].title()}")
+
+
 	def change_active_list(self):
 		"""Set active list to work with"""
 		print("\nWhich list should be your active list?")
 		print("Type in 'q' to go back.\n")
 
-		#Convert dictionary keys into list and access them by key
-		for i in range(0, len(self.lists)):
-			print(f"\t{i+1} : {list(self.lists.keys())[i].title()}")
+		self._show_lists_by_number()
 
-		print('\n')
+		print('')
 
-		prompt = int(input("Please enter the number of the list: "))
+		prompt = input("Please enter the number of the list: ")
 
 		while True:
-			if prompt != 'q':		
+			if prompt != 'q' or prompt != 'quit':		
 				try:
+					prompt = int(prompt)
 					self.active_list = list(self.lists.keys())[prompt-1]
 				except ValueError:
 					print("Please enter a valid list number!\n")
+					break
 				else:
 					self.display_active_list = self.active_list.title()
 					self.current_key = self.lists[self.active_list] 
@@ -97,13 +104,71 @@ class ShoppingList:
 		
 	def add_new_list(self):
 		"""Add a new list to the dictionary of lists"""
-		pass	
+		while True:
+			
+			new_list_name = input("Please enter the new list name or 'q' to quit: ")
+
+			if new_list_name != 'q' or new_list_name != 'quit':
+				self.lists.update({new_list_name : []})
+				self.save_to_file()	
+				prompt = input("Add another list? y/n : ")
+				if prompt == 'n' or prompt == 'no':
+					break
+				elif prompt == 'y' or 'yes':
+					continue
+			elif new_list_name == 'q' or new_list_name == 'quit':
+				break
+			
+
 
 	def delete_list(self):
-		pass
+
+		print("")
+		self._show_lists_by_number()
+		print("")
+		
+
+		prompt = input("Enter the number of the list you would like to delete. Enter 'q' to exit: ")
+
+		while True:
+
+			if prompt != 'q' or prompt != 'quit':
+				try:
+					prompt = int(prompt)
+					list_to_delete = list(self.lists.keys())[prompt-1]
+				#An except clause may name multiple exceptions as a parenthesized tuple	
+				except (ValueError, IndexError):
+					print("Please enter a valid list number!\n")
+					break
+				else:
+					del self.lists[list_to_delete]
+					print(f"The list {list_to_delete} has been deleted.")
+					break
+
 
 	def rename_list(self):
-		pass
+		
+		print("")
+		self._show_lists_by_number()
+		print("")
+
+		prompt = input("Enter the number of the list you would like to rename. Enter 'q' to exit: ")
+		new_name = input("Please enter the new name of the list: ")
+
+
+		while True:
+
+			if prompt != 'q' or prompt != 'quit':
+				try:
+					prompt = int(prompt)
+					list_to_rename = list(self.lists.keys())[prompt-1]
+					print(list_to_rename)
+				except ValueError:
+					print("Please enter a valid list number!\n")
+					break
+				else:
+					self.lists[new_name] = self.lists.pop(list_to_rename)
+					break
 
 
 	def add_item_to_list(self):
@@ -117,7 +182,7 @@ class ShoppingList:
 			new_item = input("Enter item: ")
 
 			if new_item != 'q':
-				self.lists[self.active_list].append(new_item.title())
+				self.lists[self.active_list].append(new_item).lower()
 				#groceries.append(new_item.title())
 				print(f"{new_item.title()} added!\n")
 			else:
@@ -212,7 +277,10 @@ class ShoppingList:
 				's' : "Show current items",
 				'a' : "Add an item to the list",
 				'd' : "Remove an item from the list",
-				'c' : "Delete the entire list",
+				'c' : "Delete the contents of the active list",
+				'n' : "Create a new list",
+				'r' : "Rename a list",
+				'x' : "Delete an entire list",
 				'q' : "Quit",
 			}
 
@@ -234,8 +302,14 @@ class ShoppingList:
 					self.add_item_to_list()
 				elif prompt == 'd':
 					self.remove_item_from_list()
+				elif prompt == 'n':
+					self.add_new_list()
+				elif prompt == 'r':
+					self.rename_list()
 				elif prompt == 'c':
 					self.clear_list()
+				elif prompt == 'x':
+					self.delete_list()
 				elif prompt == 'q':
 					self.save_to_file()
 					print("Your changes have been saved for the next time you come back!")

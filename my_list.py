@@ -5,7 +5,12 @@ class MyList:
 	"""A class for multiple lists through which you can navigate"""
 	def __init__(self):
 
+		#initialize settings, check if user and lists files already exist
 		self.settings = Settings()
+		self.settings._file_check_username()
+		self.settings._file_check_lists()
+
+		#initialize list control options
 		self.control = ListControl()
 
 		#set the first key to be the active list by default
@@ -88,9 +93,9 @@ class MyList:
 			menu = {
 				'1' : "Change the active list",
 				'2' : "Show current lists",
-				's' : "Show current items",
-				'a' : "Add an item to the list",
-				'd' : "Remove an item from the list",
+				's' : "Show items in active list",
+				'a' : "Add an item to the active list",
+				'd' : "Remove an item from the active list",
 				'c' : "Delete the contents of the active list",
 				'n' : "Create a new list",
 				'r' : "Rename a list",

@@ -9,13 +9,10 @@ class Settings:
 
 		self.filename = 'lists_save_file.json'
 		self.user_information_file = 'user_information.json'
-
 		self.username = ''
-		self._file_check_username()
 		self.lists = {}
-		self._file_check_lists()
-
-
+		
+		
 	def _file_check_username(self):
 		"""
 			Check if a username already exists.

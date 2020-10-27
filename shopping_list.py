@@ -1,8 +1,8 @@
 import sys
 import json
 
-class ShoppingList:
-
+class MyList:
+	"""A class for multiple lists through which you can navigate"""
 	def __init__(self):
 
 		self.filename = 'lists_save_file.json'
@@ -17,7 +17,7 @@ class ShoppingList:
 		self.active_list = next(iter(self.lists))
 		#Capitalize the list name for output to the console
 		self.display_active_list = self.active_list.title()
-		#Set the key making changes to the current list
+		#Set the key in the dictionary to which changes should be made
 		self.current_key = self.lists[self.active_list]
 
 
@@ -174,7 +174,7 @@ class ShoppingList:
 	def add_item_to_list(self):
 		"""Add one item to the list"""
 
-		print('\nPlease enter an item to add to your shopping list.\n')
+		print('\nPlease enter an item to add to your list.\n')
 		print("Enter 'q' to exit.\n")
 
 		while True:
@@ -230,7 +230,7 @@ class ShoppingList:
 					try:
 						self.current_key.remove(item_to_remove.title())
 					except ValueError:
-						print("This item doesn't exist in your shopping list!\n")
+						print("This item doesn't exist in your list!\n")
 					else:
 						print(f"{item_to_remove.title()} was removed from your list.\n")
 				else:
@@ -241,7 +241,7 @@ class ShoppingList:
 
 
 	def _check_if_list_empty(self):
-		"""Check if list is empty or not"""
+		"""Helper method to check if a list is empty or not"""
 
 		if self.current_key:
 			return True
@@ -319,6 +319,6 @@ class ShoppingList:
 
 
 if __name__ == '__main__':
-	s = ShoppingList()
-	s.display_menu()
+	m = MyList()
+	m.display_menu()
 
